@@ -1,0 +1,69 @@
+group 'protobufserver'
+version '0.0.1'
+
+apply plugin: 'java'
+apply plugin: 'kotlin'
+apply plugin: 'application'
+apply plugin: 'com.google.protobuf'
+
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "com.google.protobuf:protobuf-gradle-plugin:$protobuf_plugin_version"
+    }
+}
+
+mainClassName = "io.ktor.server.netty.EngineMain"
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
+
+sourceSets{
+    main.java.srcDirs += file("${protobuf.generatedFilesBaseDir}/main/javalite")
+}
+
+repositories {
+    mavenLocal()
+    jcenter()
+    maven { url 'https://kotlin.bintray.com/ktor' }
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile "io.ktor:ktor-server-netty:$ktor_version"
+    compile "ch.qos.logback:logback-classic:$logback_version"
+    compile "io.ktor:ktor-server-core:$ktor_version"
+    compile "io.ktor:ktor-client-core:$ktor_version"
+    compile "io.ktor:ktor-client-core-jvm:$ktor_version"
+    compile "io.ktor:ktor-client-apache:$ktor_version"
+
+    // protobuf
+    compile "com.google.protobuf:protobuf-lite:$protobuf_compiler_version"
+
+    testCompile "io.ktor:ktor-server-tests:$ktor_version"
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:$protobuf_compiler_version"
+    }
+    plugins {
+        javalite {
+            artifact = "com.google.protobuf:protoc-gen-javalite:$protobuf_compiler_version"
+        }
+    }
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                remove java
+            }
+            task.plugins {
+                javalite { }
+            }
+        }
+    }
+}

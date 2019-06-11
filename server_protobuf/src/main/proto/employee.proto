@@ -1,0 +1,9 @@
+syntax = "proto3";
+option java_package = "com.radhe";
+option java_outer_classname = "EmployeeProto";
+
+message Employee {
+    string name = 1;
+    string id = 2;
+    string email = 3;
+}
